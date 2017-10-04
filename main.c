@@ -11,7 +11,8 @@
 #include <string.h>
 #include <malloc.h>
 
-static uint8_t dolstart[4] = { 0x00, 0x00, 0x01, 0x00 };
+static const uint8_t dolstart[4] = { 0x00, 0x00, 0x01, 0x00 };
+static bool confirm = true;
 
 typedef struct FuncPattern
 {
@@ -78,21 +79,34 @@ int CPattern( FuncPattern *FPatA, FuncPattern *FPatB  )
 	return ( memcmp( FPatA, FPatB, sizeof(uint32_t) * 6 ) == 0 );
 }
 
+static void waitforenter(void)
+{
+	if(confirm)
+	{
+		puts("Press enter to exit");
+		getc(stdin);
+	}
+}
+
 static void printerr(char *msg)
 {
 	puts(msg);
-	puts("Press enter to exit");
-	getc(stdin);
+	waitforenter();
 }
 
 int main(int argc, char *argv[])
 {
-	puts("GetExtType Patcher v1.0 by FIX94");
+	puts("GetExtType Patcher v1.1 by FIX94");
 	if(argc < 2)
 	{
-		printerr("No input file specified!");
+		puts("No input file specified!");
+		puts("Usage: GetExtType <filename> <-nc>");
+		puts("-nc - Dont wait for enter press on error/exit");
+		waitforenter();
 		return -1;
 	}
+	if(argc > 2 && memcmp(argv[2],"-nc",4) == 0)
+		confirm = false;
 	FILE *f = fopen(argv[1],"rb+");
 	if(!f)
 	{
@@ -159,7 +173,6 @@ int main(int argc, char *argv[])
 	free(buf);
 	fclose(f);
 	puts("All Done!");
-	puts("Press enter to exit");
-	getc(stdin);
+	waitforenter();
 	return 0;
 }
