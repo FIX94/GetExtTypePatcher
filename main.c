@@ -9,7 +9,10 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include <string.h>
-#include <malloc.h>
+
+#ifndef __APPLE__
+	#include <malloc.h>
+#endif
 
 static const uint8_t dolstart[4] = { 0x00, 0x00, 0x01, 0x00 };
 static bool confirm = true;
